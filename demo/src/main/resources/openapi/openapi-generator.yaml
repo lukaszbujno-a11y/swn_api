@@ -1,0 +1,33 @@
+inputSpec: ./src/main/resources/openapi/api.yaml
+output: generated-code
+
+
+#typeMappings:
+#  ErrorMsg: pl.ufg.sas.common.rest.ufg.model.ErrorMsg
+#  SzczegolyBleduLista: pl.ufg.sas.common.rest.ufg.model.SzczegolyBleduLista
+#
+#importMappings:
+#  ErrorMsg: pl.ufg.sas.common.rest.ufg.model.ErrorMsg
+#  SzczegolyBleduLista: pl.ufg.sas.common.rest.ufg.model.SzczegolyBleduLista
+
+globalProperties:
+  models: ""
+
+additionalProperties:
+  #  apiPackage: pl.ufg.app.sas.cache.gen.rest.api
+  dateLibrary: java8
+  generatePom: false
+  hideGenerationTimestamp: true
+  disallowAdditionalPropertiesIfNotPresent: false
+
+  apiPackage: com.example.demo.gen.rest.api
+  modelPackage: com.example.demo.gen.rest.api.model
+
+  # generuj z Jakarta, zgodnie ze Spring Boot 3.x
+  useJakartaEe: true
+  # interfaceOnly jest fajne — implementujesz sam
+  interfaceOnly: true
+  delegatePattern: true
+
+  skipGenerateModels: false        # generuj modele
+  skipOverwrite: true  # nie nadpisuj istniejących plików

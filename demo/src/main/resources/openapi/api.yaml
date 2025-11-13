@@ -1,0 +1,429 @@
+openapi: 3.0.3
+info:
+  title: SWN Service
+  version: 1.0.0
+  description: REST API dla SWN.
+
+tags:
+  - name: niezgodnosci
+    description: Adresy zwiazane z niezgodnosciami
+  - name: niezgodnosci-korekty
+    description: Adresy zwiazane z korektami dla niezgodnosci
+
+paths:
+  /niezgodnosci/{cykl_id}/{pakiet_id}:
+    get:
+      tags:
+        - niezgodnosci
+      summary: Pobierz pakiety niezgodnosci z cyklu
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: cykl_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: pakiet_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pakiet niezgodnosc dla cyklu i strony
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NiezgodnosciResponse'
+        '400':
+          description: Błąd walidacji danych wejściowych
+          content:
+            problem/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMsg'
+        '404':
+          description: Cykl  lub pakiet nie istnieje
+          content:
+            problem/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMsg'
+
+  /niezgodnosci/{cykl_id}/odpowiedzi:
+    post:
+      tags:
+        - niezgodnosci
+      summary: Przekaz odpowiedzi cyklu
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: cykl_id
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: X-LICZBA-ODPOWIEDZI-W-PAKIECIE
+          description: Liczba odpowiedzi zawartych w przesyłanym pakiecie
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-LICZBA-ODPOWIEDZI-W-CYLKU
+          description: Liczba wszystkich odpowiedzi do przekazanie w ramach cyklu
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OdpowiedziRequest'
+      responses:
+        '200':
+          description: |
+            Całkowity (sukces: 1) lub częściowy (sukces: 0) sukces w dodaniu odpowiedzi.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OdpowiedziResponse'
+        '400':
+          description: Błąd walidacji danych wejściowych
+          content:
+            problem/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMsg'
+        '404':
+          description: Cykl nie istnieje
+          content:
+            problem/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMsg'
+        '413':
+          description: |
+            Liczba obiektów deklarowanych jest większa niż maksymalnie dozwolona
+          headers:
+            X-MAX-ODPOWIEDZI-W-PAKIECIE:
+              description: Maksymalna liczba odpowiedzi do przesłania w ramach jednego pakietu
+              schema:
+                type: integer
+          content:
+            problem/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMsg'
+
+  /niezgodnosci/{cykl_id}/korekty/{pakiet_id}:
+    get:
+      tags:
+        - niezgodnosci-korekty
+      summary: Pobierz pakiet informacje o korektach dla cyklu niezgodnosci
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: cykl_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: pakiet_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista korekt dla cyklu niezgodnosci
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NiezgodnosciKorektyResponse'
+        '400':
+          description: |
+            Błąd walidacji danych wejściowych
+          content:
+            problem/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMsg'
+        '404':
+          description: Cykl lub pakiet nie istnieje
+          content:
+            problem/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMsg'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Wymagany token autoryzacyjny JWT. Nagłówek: `Authorization: Bearer {token}`
+  schemas:
+
+    # Niezgodnosci
+    NiezgodnosciResponse:
+      type: object
+      required:
+        - sukces
+        - dataKoncaSkladaniaOdpowiedzi
+        - ileMiesiecyWstrzymanaOdpowiedz
+      properties:
+        sukces:
+          $ref: '#/components/schemas/Sukces'
+        dataKoncaSkladaniaOdpowiedzi:
+          type: string
+          format: date
+          description: Data końca składania odpowiedzi
+        ileMiesiecyWstrzymanaOdpowiedz:
+          type: integer
+          description: |
+            Liczba miesiecy zawieszenia odpowiedzi w przypadku odpowiedzi "W"
+        niezgodnosci:
+          type: array
+          items:
+            $ref: '#/components/schemas/Niezgodnosc'
+
+    Niezgodnosc:
+      type: object
+      properties:
+        idNiezgodnosci:
+          $ref: '#/components/schemas/IdNiezgodnosci'
+        regula:
+          type: string
+          maxLength: 88
+        regulaNumer:
+          type: string
+          maxLength: 5
+        regulaNazwa:
+          type: string
+          maxLength: 80
+        zakladUbezpieczen:
+          type: string
+          maxLength: 32
+        obiekt:
+          type: string
+          maxLength: 1
+        polisaPakiet:
+          type: integer
+        polisaTryb:
+          type: string
+          maxLength: 1
+        zdarzeniePakiet:
+          type: integer
+        zdarzenieTryb:
+          type: string
+          maxLength: 1
+        odszkodowaniePakiet:
+          type: integer
+        odszkodowanieTryb:
+          type: string
+          maxLength: 1
+        atrybutNazwa:
+          type: string
+          maxLength: 20
+        atrybutWartosc:
+          type: string
+          maxLength: 100
+        wartoscSugerowana:
+          type: string
+          maxLength: 100
+        polisaCzyFlowowa:
+          type: string
+          maxLength: 1
+        polisaNumer:
+          type: string
+          maxLength: 100
+        polisaRodzajPolisy:
+          type: string
+          maxLength: 1
+        zdarzenieIdentyfikatorSzkody:
+          type: string
+          maxLength: 100
+        zdarzenieTypPolisy:
+          type: string
+          maxLength: 2
+        zdarzenieTypSzkody:
+          type: string
+          maxLength: 1
+        odszkodowanieCzyWyplata:
+          type: string
+          maxLength: 1
+        odszkodowanieData:
+          type: string
+          format: date
+        wnbNumerPolisy:
+          type: string
+          maxLength: 100
+        podmiotImie:
+          type: string
+          maxLength: 200
+        podmiotNazwisko:
+          type: string
+          maxLength: 200
+        podmiotNazwa:
+          type: string
+          maxLength: 510
+        podmiotPesel:
+          type: string
+          maxLength: 26
+        podmiotRegon:
+          type: string
+          maxLength: 32
+        pojazdVin:
+          type: string
+          maxLength: 100
+        pojazdNumerRejestracyjny:
+          type: string
+          maxLength: 30
+        pojazdRodzajPojazdu:
+          type: string
+          maxLength: 200
+      required:
+        - idNiezgodnosci
+        - regula
+        - regulaNumer
+        - regulaNazwa
+        - zakladUbezpieczen
+        - obiekt
+
+    OdpowiedziRequest:
+      type: object
+      properties:
+        odpowiedziNiezgodnosc:
+          type: array
+          items:
+            $ref: '#/components/schemas/OdpowiedzNiezgodnosc'
+
+
+    OdpowiedzNiezgodnosc:
+      type: object
+      required:
+        - idNiezgodnosci
+        - ostatni
+        - login
+        - odpowiedz
+        - dataOdpowiedzi
+      properties:
+        idNiezgodnosci:
+          $ref: '#/components/schemas/IdNiezgodnosci'
+        ostatni:
+          type: integer
+          enum: [0, 1]
+          description: |
+            Flaga określająca czy dany rekord reprezentuje ostatnią udzieloną odpowiedź na wykrytą niezgodność:
+            0 – zakład udzielił świeższej odpowiedzi
+            1 – odpowiedź jest ostatnią udzieloną na daną niezgodność
+        login:
+          type: string
+          maxLength: 80
+          description: Login użytkownika udzielającego odpowiedzi
+        odpowiedz:
+          type: string
+          maxLength: 1
+          enum: ["B","I","W"]
+          description: |
+            Odpowiedź na niezgodność:
+            B - "Brak niezgodności", 
+            I - "Ignoruj", 
+            W - "Wstrzymaj"
+        dataOdpowiedzi:
+          type: string
+          format: date
+          description: Data udzielenia odpowiedzi
+        zawieszenieOdpowiedzi:
+          type: number
+          description: Liczba miesiecy zawieszenia odpowiedzi w przypadku odpowiedzi "W"
+
+    OdpowiedziResponse:
+      type: object
+      required:
+        - sukces
+        - partialSuccess
+        - ilePoprawnie
+        - failed
+      properties:
+        sukces:
+          $ref: '#/components/schemas/Sukces'
+        czesciowySukces:
+          type: boolean
+          description: Flaga informująca czy wystąpiły błędy biznesowe podczas dodawania odpowiedzi
+        zapisaneRekordy:
+          type: integer
+          description: Liczba rekordów poprawnie zapisanych
+        odrzuconeRekordy:
+          type: integer
+          description: Liczba rekordów odrzuconych
+        odrzuconeRekordySzczegoly:
+          type: object
+          properties:
+            idNiezgodnosci:
+              $ref: '#/components/schemas/IdNiezgodnosci'
+            szczegolyBleduLista:
+              type: array
+              items:
+                $ref: '#/components/schemas/SzczegolyBleduLista'
+
+    # Niezgodnosci-Korekty
+    NiezgodnosciKorektyResponse:
+      type: object
+      required:
+        - sukces
+        - korekty
+      properties:
+        sukces:
+          $ref: '#/components/schemas/Sukces'
+        korekty:
+          type: array
+          items:
+            $ref: '#/components/schemas/NiezgodnoscKorekta'
+
+    NiezgodnoscKorekta:
+      type: object
+      required:
+        - idNiezgodnosci
+        - czyKorekta
+      properties:
+        idNiezgodnosci:
+          $ref: '#/components/schemas/IdNiezgodnosci'
+        czyKorekta:
+          enum: ["T","N"]
+          description: |
+            Czy rekord niezgodnosci został zaktualizowany przez zakład ubezpieczeń:
+            T - "TAK - rekord został zaktualizowany", 
+            N - "NIE - rekord nie zosał zaktualizowany"
+    # Wspolne
+    Sukces:
+      type: integer
+      enum: [0, 1]
+      description: |
+        Flaga powodzenia operacji (0 – niepowodzenie, 1 – sukces)
+
+    IdNiezgodnosci:
+      type: integer
+      description: |
+        Identyfikator niezgodnosci 
+
+    # Bledy
+    ErrorMsg:
+      type: object
+      properties:
+        title:
+          type: string
+        detail:
+          type: string
+        szczegolyBleduLista:
+          type: array
+          items:
+            $ref: '#/components/schemas/SzczegolyBleduLista'
+    SzczegolyBleduLista:
+      type: object
+      properties:
+        identyfikatorBledu:
+          type: string
+        opisBledu:
+          type: string
+        kodBledu:
+          type: string
+
