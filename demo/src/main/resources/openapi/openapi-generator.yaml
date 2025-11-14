@@ -31,3 +31,5 @@ additionalProperties:
 
   skipGenerateModels: false        # generuj modele
   skipOverwrite: true  # nie nadpisuj istniejących plików
+
+  useSpringBoot3: true
