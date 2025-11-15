@@ -2,15 +2,25 @@ package com.example.demo.ws.rest.api.impl;
 
 import com.example.demo.gen.rest.api.NiezgodnosciApi;
 import com.example.demo.gen.rest.api.model.*;
-import io.swagger.v3.oas.annotations.servers.Servers;
+import com.example.demo.repository.KorektaRepo;
+import com.example.demo.ws.rest.api.mappers.MapUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.NativeWebRequest;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class NiezgodnosciApiImpl implements NiezgodnosciApi {
+
+    @Autowired
+    private KorektaRepo korektaRepo;
+
+    public NiezgodnosciApiImpl(KorektaRepo korektaRepo){
+        this.korektaRepo = korektaRepo;
+    }
 
     @Override
     public Optional<NativeWebRequest> getRequest() {
@@ -19,12 +29,7 @@ public class NiezgodnosciApiImpl implements NiezgodnosciApi {
 
     @Override
     public ResponseEntity<NiezgodnosciKorektyResponse> niezgodnosciCyklIdKorektyPakietIdGet(String cyklId, String pakietId) {
-        NiezgodnosciKorektyResponse niezgodnosciKorektyResponse = new NiezgodnosciKorektyResponse();
-        niezgodnosciKorektyResponse.addKorektyItem(new NiezgodnoscKorekta(1, NiezgodnoscKorekta.CzyKorektaEnum.T));
-        niezgodnosciKorektyResponse.addKorektyItem(new NiezgodnoscKorekta(2, NiezgodnoscKorekta.CzyKorektaEnum.T));
-        niezgodnosciKorektyResponse.addKorektyItem(new NiezgodnoscKorekta(3, NiezgodnoscKorekta.CzyKorektaEnum.N));
-        niezgodnosciKorektyResponse.addKorektyItem(new NiezgodnoscKorekta(4, NiezgodnoscKorekta.CzyKorektaEnum.T));
-        niezgodnosciKorektyResponse.addKorektyItem(new NiezgodnoscKorekta(5, NiezgodnoscKorekta.CzyKorektaEnum.N));
+        NiezgodnosciKorektyResponse niezgodnosciKorektyResponse = new NiezgodnosciKorektyResponse(Sukces.NUMBER_1,MapUtil.toNiezgodnoscKorektyLista(korektaRepo.findByCyklIdAndPakietId(cyklId,pakietId)));
         return ResponseEntity.ok(niezgodnosciKorektyResponse);
     }
 
