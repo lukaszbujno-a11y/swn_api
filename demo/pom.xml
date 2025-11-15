@@ -82,6 +82,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+<!--Artemis MQ-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-artemis</artifactId>
+			<version>3.5.7</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
