@@ -4,11 +4,12 @@ import com.example.demo.gen.rest.api.NiezgodnosciApi;
 import com.example.demo.gen.rest.api.model.*;
 import io.swagger.v3.oas.annotations.servers.Servers;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import java.util.Optional;
 
-@Servers
+@Service
 public class NiezgodnosciApiImpl implements NiezgodnosciApi {
 
     @Override

@@ -4,6 +4,7 @@ import com.example.demo.gen.rest.api.model.NiezgodnoscKorekta;
 import com.example.demo.gen.rest.api.model.NiezgodnosciKorektyResponse;
 import com.example.demo.gen.rest.api.model.NiezgodnosciResponse;
 import com.example.demo.ws.rest.api.impl.NiezgodnosciApiImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class NiezgodnosciController
 {
 
+    @Autowired
     NiezgodnosciApiImpl niezgodnosciApiImpl;
 
     @GetMapping("/niezgodnosci")
@@ -28,13 +30,11 @@ public class NiezgodnosciController
 
     @GetMapping("/niezgodnosci/{cykl_id}/{pakiet_id}")
     public ResponseEntity<NiezgodnosciResponse> demo3(@PathVariable String cykl_id, @PathVariable String pakiet_id) {
-        niezgodnosciApiImpl = new NiezgodnosciApiImpl();
         return niezgodnosciApiImpl.niezgodnosciCyklIdPakietIdGet(cykl_id, pakiet_id);
     }
 
     @GetMapping("/niezgodnosci/{cykl_id}/korekty/{pakiet_id}")
     public ResponseEntity<NiezgodnosciKorektyResponse> demo4(@PathVariable String cykl_id, @PathVariable String pakiet_id) {
-        niezgodnosciApiImpl = new NiezgodnosciApiImpl();
         return niezgodnosciApiImpl.niezgodnosciCyklIdKorektyPakietIdGet(cykl_id, pakiet_id);
     }
 }
