@@ -34,6 +34,7 @@ public class NiezgodnosciController
 
     @GetMapping("/niezgodnosci/{cykl_id}/korekty/{pakiet_id}")
     public ResponseEntity<NiezgodnosciKorektyResponse> demo4(@PathVariable String cykl_id, @PathVariable String pakiet_id) {
+        niezgodnosciApiImpl = new NiezgodnosciApiImpl();
         return niezgodnosciApiImpl.niezgodnosciCyklIdKorektyPakietIdGet(cykl_id, pakiet_id);
     }
 }
