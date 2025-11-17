@@ -83,6 +83,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- JSON Schema Validation -->
+		<dependency>
+			<groupId>com.networknt</groupId>
+			<artifactId>json-schema-validator</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+
 <!--Artemis MQ-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

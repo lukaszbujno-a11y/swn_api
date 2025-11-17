@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PakietySWN",
+  "description": "Schemat dla pakietów zamieszczanych na kolejce jms w ramach integracji systemów SWN, a eUFG",
+  "type": "object",
+  "properties": {
+  	"correlationId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Identyfikator korelacyjny ułatwiający śledzenie procesów."
+    },
+    "typObiektu": {
+      "type": "string",
+      "enum": [
+        "NIEZGODNOSC",
+        "KOREKTA"
+        ],
+      "description": "Rodzaj obiektu."
+    },
+    "czasPrzekazaniaPakietu": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Czas wygenerowania wiadomości."
+    },
+    "cyklId": {
+      "type": "string",
+      "description": "Identyfikator cyklu, którego dotyczą pakiety."
+    },
+    "pakietId": {
+      "type": "string",
+      "description": "Identyfikator pakietu do pobrania."
+    },
+    "numerPakietu": {
+      "type": "integer",
+      "description": "Numer przekazanego pakietu."
+    },
+    "liczbaPakietowDoPrzekazania": {
+      "type": "integer",
+      "description": "Liczba wszystkich pakietow do przekazania."
+    }
+  },
+  "required": [
+    "correlationId",
+    "typObiektu",
+    "czasPrzekazaniaPakietu",
+    "cyklId",
+    "pakietId",
+    "numerPakietu",
+    "liczbaPakietowDoPrzekazania"
+  ]
+}
